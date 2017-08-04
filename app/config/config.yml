@@ -2,6 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
+    - { resource: "@KitHelloBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -67,3 +68,50 @@ swiftmailer:
     username: '%mailer_user%'
     password: '%mailer_password%'
     spool: { type: memory }
+fos_rest:
+    view:
+#        default_engine: php
+        view_response_listener: force
+        force_redirects:
+          html: true
+#          xml: true
+        formats:
+            jsonp: true
+            json: true
+            xml: true
+            rss: false
+        templating_formats:
+            html: true
+        mime_types:
+            json: ['application/json', 'application/x-json', 'application/vnd.example-com.foo+json']
+            rss: 'application/rss+xml'
+            jpg: 'image/jpeg'
+            png: 'image/png'
+        jsonp_handler: ~
+    body_listener: true
+    param_fetcher_listener: force
+    allowed_methods_listener: true
+    access_denied_listener:
+        json: true
+    format_listener:
+        rules:
+            - { path: ^/liip/hello/rest, priorities: [html, json, xml], fallback_format: ~, prefer_extension: false }
+            # force rss
+            - { path: ^/liip/customHandler, fallback_format: rss }
+            # force jsonp, return a 406 on a non jsonp request
+            - { path: ^/liip/jsonp, priorities: [jsonp], fallback_format: false, prefer_extension: true }
+            - { path: ^/, priorities: [ html, json, xml ], fallback_format: ~, prefer_extension: true }
+    routing_loader:
+        default_format: ~
+    exception:
+        codes:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
+            'Doctrine\ORM\OptimisticLockException': HTTP_CONFLICT
+        messages:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': true
+    service:
+        #view_handler: liip_hello.view_handler
+    serializer:
+#        version: 1.0
+#        groups: [data]
+    

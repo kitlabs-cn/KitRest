@@ -1,0 +1,10 @@
+#kit_hello_users:
+#    resource: "@KitHelloBundle/Resources/config/routing/users.yml"
+#    prefix:   /users
+
+kit_hello_homepage:
+    path:     /
+    defaults: { _controller: KitHelloBundle:Default:index }
+kit_hello_users_getusers:
+    path:     /users/getusers
+    defaults: { _controller: KitHelloBundle:Users:getusers }
